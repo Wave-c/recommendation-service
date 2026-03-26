@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Персональная выдача: кому (userUuid), что рекомендуем (заказ или исполнитель), скор и порядок.
+/// TODO: использовать для кэша/офлайн-пересчёта, когда появится пайплайн; в v1 выдача считается на лету в application-слое.
+model Recommendation {
+  id          Int      @id @default(autoincrement())
+  userUuid    String
+  /// JOB — подбор заказов исполнителю; EXECUTOR — подбор исполнителей под задачу заказчика
+  subjectType String
+  /// Внешний id заказа или пользователя в основной системе
+  subjectId   String
+  score       Float    @default(0)
+  reason      String?
+  ranking     Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userUuid, subjectType, subjectId])
+  @@index([userUuid, subjectType])
+  @@index([score])
+}
