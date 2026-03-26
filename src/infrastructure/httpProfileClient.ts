@@ -2,7 +2,7 @@ export type ProfileRaw = unknown;
 
 /**
  * profile-service client.
- * Только HTTP: `GET {baseUrl}/profiles/me` с заголовками `X-User-Id` / `X-Roles`.
+ * Только HTTP: `GET {baseUrl}/profiles/me` с заголовком `X-User-Id`.
  *
  * Сервис рекомендаций ничего не “вырезает” из ответа — мы используем его только для:
  * - `stack` (для скоринга)
@@ -15,7 +15,7 @@ export class HttpProfileClient {
     return this.baseUrl.replace(/\/$/, "");
   }
 
-  async getMe(xUserId: string, xRoles: string): Promise<ProfileRaw | null> {
+  async getMe(xUserId: string): Promise<ProfileRaw | null> {
     const base = this.base();
     const url = base.toLowerCase().endsWith("/profiles")
       ? `${base}/me`
@@ -24,7 +24,6 @@ export class HttpProfileClient {
       method: "GET",
       headers: {
         "X-User-Id": xUserId.trim(),
-        "X-Roles": xRoles.trim(),
       },
     });
 

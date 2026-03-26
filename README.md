@@ -45,7 +45,6 @@ npm start
 На все запросы к recommendation-service нужны заголовки:
 
 - `X-User-Id`
-- `X-Roles`
 
 Они прокидываются в profile-service при `GET {PROFILE_SERVICE_BASE_URL}/profiles/me`.
 
@@ -53,12 +52,12 @@ npm start
 
 - `GET /health` — `{ "status": "ok" }`
 - `GET /recommendations/me?subjectType=JOB`
-  - headers: `X-User-Id`, `X-Roles`
+  - headers: `X-User-Id`
   - response: `{ "items": [...] }`, где `items` — исходные JSON объекты из jobs-service, отсортированные по score
   - если профиль не найден: `{ "error": "не удалось найти профиль" }`
   - если задачи не найдены: `{ "error": "не удалось найти задачи" }`
 - `GET /recommendations/me/cursor?subjectType=JOB`
-  - headers: `X-User-Id`, `X-Roles`, `X-Cursor` (опционально; курсор для постраничной выдачи)
+  - headers: `X-User-Id`, `X-Cursor` (опционально; курсор для постраничной выдачи)
   - response: `{ "items": [...], "nextCursor": "...", "hasMore": true/false }`, где страница фиксирована: `pageSize=1`
   - если профиль не найден: `{ "error": "не удалось найти профиль" }`
   - если задачи не найдены: `{ "error": "не удалось найти задачи" }`

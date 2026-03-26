@@ -83,7 +83,6 @@ export class GetRecommendationsForMe {
 
   async executeAll(
     xUserId: string,
-    xRoles: string,
     subjectType: SubjectType,
   ): Promise<JobsRawItem[]> {
     if (!this.profiles) {
@@ -93,7 +92,7 @@ export class GetRecommendationsForMe {
       throw new Error("не удалось найти задачи");
     }
 
-    const profile = await this.profiles.getMe(xUserId, xRoles);
+    const profile = await this.profiles.getMe(xUserId);
     if (!profile) {
       throw new Error("не удалось найти профиль");
     }
@@ -135,7 +134,6 @@ export class GetRecommendationsForMe {
 
   async executePaged(
     xUserId: string,
-    xRoles: string,
     subjectType: SubjectType,
     xCursor: string | undefined,
   ): Promise<{ items: JobsRawItem[]; nextCursor: string | null; hasMore: boolean }> {
@@ -146,7 +144,7 @@ export class GetRecommendationsForMe {
       throw new Error("не удалось найти задачи");
     }
 
-    const profile = await this.profiles.getMe(xUserId, xRoles);
+    const profile = await this.profiles.getMe(xUserId);
     if (!profile) {
       throw new Error("не удалось найти профиль");
     }

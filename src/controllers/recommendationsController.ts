@@ -31,14 +31,8 @@ export function createRecommendationsAllController(useCase: GetRecommendationsFo
       return;
     }
 
-    const xRoles = req.user?.roles;
-    if (!xRoles) {
-      res.status(401).json({ error: "Unauthorized", message: "Missing X-Roles" });
-      return;
-    }
-
     try {
-      const items = await useCase.executeAll(userUuid, xRoles, subjectType);
+      const items = await useCase.executeAll(userUuid, subjectType);
       res.json({ items });
     } catch (err: unknown) {
       handleError(err, res);
@@ -61,15 +55,9 @@ export function createRecommendationsCursorController(useCase: GetRecommendation
       return;
     }
 
-    const xRoles = req.user?.roles;
-    if (!xRoles) {
-      res.status(401).json({ error: "Unauthorized", message: "Missing X-Roles" });
-      return;
-    }
-
     try {
       const xCursor = headerString(req, "x-cursor");
-      const page = await useCase.executePaged(userUuid, xRoles, subjectType, xCursor);
+      const page = await useCase.executePaged(userUuid, subjectType, xCursor);
       res.json(page);
     } catch (err: unknown) {
       handleError(err, res);
