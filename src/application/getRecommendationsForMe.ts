@@ -60,9 +60,37 @@ function extractValuesArray(value: unknown): string[] {
   return extractStringArray(value);
 }
 
+/** Строки или объекты вида `{ id, name }` как в jobs-service. */
+function extractTechNamesFromMixedArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const out: string[] = [];
+  for (const item of value) {
+    if (typeof item === "string" && item.trim()) {
+      out.push(item.trim());
+      continue;
+    }
+    if (item && typeof item === "object") {
+      const o = item as Record<string, unknown>;
+      const name = o.name ?? o.title ?? o.label;
+      if (typeof name === "string" && name.trim()) {
+        out.push(name.trim());
+        continue;
+      }
+      if (typeof o.id === "string" && o.id.trim()) {
+        out.push(o.id.trim());
+      }
+    }
+  }
+  return out;
+}
+
 function extractTechnologiesForScoring(raw: JobsRawItem): string[] {
   const o = raw as Record<string, unknown>;
   const tech = o.technologies ?? o.stack ?? o.skills ?? o.specialization;
+  if (Array.isArray(tech)) {
+    const fromObjects = extractTechNamesFromMixedArray(tech);
+    if (fromObjects.length > 0) return fromObjects;
+  }
   return extractValuesArray(tech);
 }
 
@@ -70,6 +98,10 @@ function extractProfileStack(profile: ProfileRaw): string[] {
   if (profile && typeof profile === "object") {
     const o = profile as Record<string, unknown>;
     const stack = o.stack;
+    if (Array.isArray(stack)) {
+      const fromObjects = extractTechNamesFromMixedArray(stack);
+      if (fromObjects.length > 0) return fromObjects;
+    }
     return extractStringArray(stack);
   }
   return [];
@@ -354,5 +386,55 @@ export class GetRecommendationsForMe {
     });
 
     return withBudget.map((x) => x.job);
+  }
+
+  /**
+   * Та же сортировка по пересечению stack профиля и technologies задач.
+   * Список задач запрашивается у jobs-service: `GET /api/tasks/filtered`.
+   */
+  async executeSortByStackFromFilteredTasks(
+    xUserId: string,
+    subjectType: SubjectType,
+  ): Promise<string[]> {
+    if (!this.profiles) {
+      throw new Error("не удалось найти профиль");
+    }
+    if (!this.jobs) {
+      throw new Error("не удалось найти задачи");
+    }
+    const profile = await this.profiles.getMe(xUserId);
+    if (!profile) {
+      throw new Error("не удалось найти профиль");
+    }
+    if (subjectType !== SubjectType.JOB) {
+      throw new Error("subjectType must be JOB");
+    }
+
+    const jobs = await this.jobs.listFilteredTasks();
+    if (!jobs.length) {
+      throw new Error("не удалось найти задачи");
+    }
+
+    const profileStack = extractProfileStack(profile);
+
+    const scored = jobs
+      .map((job) => {
+        const id = extractCursorId(job);
+        const tags = extractTechnologiesForScoring(job);
+        return {
+          id,
+          job,
+          score: scoreStackOverlap(profileStack, tags).score,
+        };
+      })
+      .filter((x): x is { id: string; job: JobsRawItem; score: number } => Boolean(x.id));
+
+    scored.sort((a, b) => {
+      const byScore = b.score - a.score;
+      if (byScore !== 0) return byScore;
+      return b.id.localeCompare(a.id);
+    });
+
+    return scored.map((x) => x.id);
   }
 }

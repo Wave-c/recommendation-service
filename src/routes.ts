@@ -6,6 +6,7 @@ import {
   createRecommendationsBudgetController,
   createRecommendationsCursorController,
   createRecommendationsSeachController,
+  createRecommendationsStackFromFilteredController,
 } from "./controllers/recommendationsController";
 
 export function createRoutes(
@@ -41,6 +42,11 @@ export function createRoutes(
     "/recommendations/me/sort/budget",
     requireAuth,
     createRecommendationsBudgetController(getRecommendations),
+  );
+  router.get(
+    "/recommendations/me/sort/technologies",
+    requireAuth,
+    createRecommendationsStackFromFilteredController(getRecommendations),
   );
 
   return router;

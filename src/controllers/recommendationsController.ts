@@ -176,3 +176,37 @@ export function createRecommendationsBudgetController(
     }
   };
 }
+
+export function createRecommendationsStackFromFilteredController(
+  useCase: GetRecommendationsForMe,
+) {
+  return async function getRecommendationsStackFromFiltered(
+    req: Request,
+    res: Response,
+  ): Promise<void> {
+    const userUuid = req.user?.userUuid;
+    if (!userUuid) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+    const subjectType = parseSubjectType(
+      typeof req.query.subjectType === "string"
+        ? req.query.subjectType
+        : undefined,
+    );
+    if (!subjectType) {
+      res.status(400).json({ error: "subjectType must be JOB" });
+      return;
+    }
+
+    try {
+      const items = await useCase.executeSortByStackFromFilteredTasks(
+        userUuid,
+        subjectType,
+      );
+      res.json({ items });
+    } catch (err: unknown) {
+      handleError(err, res);
+    }
+  };
+}
