@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { GetRecommendationsForMe } from "../application/getRecommendationsForMe";
 import { parseSubjectType } from "../domain/subjectType";
+import { log } from "node:console";
 
 function headerString(req: Request, name: string): string | undefined {
   const v = req.headers[name.toLowerCase()];
@@ -68,7 +69,6 @@ export function createRecommendationsCursorController(
       res.status(400).json({ error: "subjectType must be JOB" });
       return;
     }
-
     try {
       const xCursor = headerString(req, "x-cursor");
       const page = await useCase.executePaged(userUuid, subjectType, xCursor);

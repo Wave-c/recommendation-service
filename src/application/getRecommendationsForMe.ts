@@ -2,6 +2,7 @@ import { SubjectType } from "../domain/subjectType";
 import { scoreStackOverlap } from "../domain/recommendationScoring";
 import type { HttpJobsClient, JobsRawItem } from "../infrastructure/externalJobsClient";
 import type { HttpProfileClient, ProfileRaw } from "../infrastructure/httpProfileClient";
+import { log } from "node:console";
 
 type CursorPayload = { id: string };
 
@@ -175,7 +176,6 @@ export class GetRecommendationsForMe {
     if (!this.jobs) {
       throw new Error("не удалось найти задачи");
     }
-
     const profile = await this.profiles.getMe(xUserId);
     if (!profile) {
       throw new Error("не удалось найти профиль");
@@ -227,23 +227,20 @@ export class GetRecommendationsForMe {
     if (!this.jobs) {
       throw new Error("не удалось найти задачи");
     }
-
     const profile = await this.profiles.getMe(xUserId);
     if (!profile) {
       throw new Error("не удалось найти профиль");
     }
-
     const profileStack = extractProfileStack(profile);
 
     if (subjectType !== SubjectType.JOB) {
       throw new Error("subjectType must be JOB");
     }
-
     const jobs = await this.jobs.listOpenJobs();
     if (!jobs.length) {
+      log("qwe")
       throw new Error("не удалось найти задачи");
     }
-
     const pageSize = 1;
 
     const scored = jobs.map((job) => {

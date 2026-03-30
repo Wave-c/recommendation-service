@@ -28,11 +28,6 @@ export function createRoutes(
     requireAuth,
     createRecommendationsCursorController(getRecommendations),
   );
-  // router.get(
-  //   "/recommendations/me/seach",
-  //   requireAuth,
-  //   createRecommendationsSeachController(getRecommendations),
-  // );
   router.post(
     "/recommendations/me/search",
     requireAuth,

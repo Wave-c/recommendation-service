@@ -1,3 +1,6 @@
+import "dotenv/config";
+import { log } from "node:console";
+
 export type JobsRawItem = unknown;
 
 /**
@@ -15,8 +18,8 @@ export class HttpJobsClient {
   async listOpenJobs(): Promise<JobsRawItem[]> {
     const res = await fetch(this.url("/api/tasks"), { method: "GET" });
     if (!res.ok) throw new Error("не удалось найти задачи");
-    const data: unknown = await res.json();
-    return Array.isArray(data) ? data : [];
+    const data: any = (await res.json());
+    return Array.isArray(data.data) ? data.data : [];
   }
 
   /** Отфильтрованный список задач (те же поля, что и у `/api/tasks`, включая `technologies`). */

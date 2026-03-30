@@ -1,3 +1,6 @@
+import { log } from "node:console";
+import "dotenv/config";
+
 export type ProfileRaw = unknown;
 
 /**
