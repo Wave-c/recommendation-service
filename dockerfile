@@ -36,7 +36,7 @@ COPY --from=build /app/prisma ./prisma
 EXPOSE 8077
 
 # Переменная окружения
-ENV NODE_ENV=production
+# ENV NODE_ENV=production
 
 # Запуск миграций + старт
-CMD sh -c "npx prisma migrate deploy && node dist/app.js"
+CMD sh -c "npx prisma migrate deploy && NODE_ENV=production node dist/app.js"
