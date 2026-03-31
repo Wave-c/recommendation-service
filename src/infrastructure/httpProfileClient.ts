@@ -38,6 +38,7 @@ export class HttpProfileClient {
 
 export function createProfileClient(): HttpProfileClient | null {
   const raw = process.env.PROFILE_SERVICE_BASE_URL?.trim();
+  log(raw);
   if (!raw) return null;
   return new HttpProfileClient(raw);
 }
