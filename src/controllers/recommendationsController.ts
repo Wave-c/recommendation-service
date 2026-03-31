@@ -71,8 +71,11 @@ export function createRecommendationsCursorController(
     }
     try {
       const xCursor = headerString(req, "x-cursor");
+      log("qwe")
       const page = await useCase.executePaged(userUuid, subjectType, xCursor);
+      log("qwe")
       res.json(page);
+      log("qwe")
     } catch (err: unknown) {
       log(err);
       handleError(err, res);
