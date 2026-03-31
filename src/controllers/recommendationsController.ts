@@ -74,6 +74,7 @@ export function createRecommendationsCursorController(
       const page = await useCase.executePaged(userUuid, subjectType, xCursor);
       res.json(page);
     } catch (err: unknown) {
+      log(err);
       handleError(err, res);
     }
   };
