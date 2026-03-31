@@ -222,6 +222,7 @@ export class GetRecommendationsForMe {
     xCursor: string | undefined,
   ): Promise<{ items: JobsRawItem[]; nextCursor: string | null; hasMore: boolean }> {
     if (!this.profiles) {
+      log("asd")
       throw new Error("не удалось найти профиль");
     }
     if (!this.jobs) {
@@ -229,6 +230,7 @@ export class GetRecommendationsForMe {
     }
     const profile = await this.profiles.getMe(xUserId);
     if (!profile) {
+      log("asd")
       throw new Error("не удалось найти профиль");
     }
     const profileStack = extractProfileStack(profile);
